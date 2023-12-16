@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.print.DocFlavor.STRING;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -91,11 +93,18 @@ public class GUI extends Application {
                 button3,
                 button4);
 
-        // button1.setOnAction((event) -> {
-        // textField.setText("");
-        // textField1.setText("");
-        // textField2.setText("");
-        // });
+        button1.setOnAction((event) -> {
+            String email = TextFieldEmail.getText();
+            String naam = TextFieldNaam.getText();
+            String geboorteDatum = TextFieldGeboortedatum.getText();
+            Integer geslacht = Integer.valueOf(TextFieldGeslacht.getText());
+            String adres = TextFieldAdres.getText();
+            String woonplaats = TextFieldWoonplaats.getText();
+            String land = TextFieldLand.getText();
+
+            setDataInDatabase(email, naam, geboorteDatum, geslacht, adres, woonplaats, land);
+
+        });
 
         button2.setOnAction((event) -> {
             String email = TextFieldEmail.getText();
@@ -105,7 +114,7 @@ public class GUI extends Application {
             setDataFromDatabase(TextFieldGeslacht, "Geslacht", email);
             setDataFromDatabase(TextFieldAdres, "Adres", email);
             setDataFromDatabase(TextFieldWoonplaats, "Woonplaats", email);
-            setDataFromDatabase(TextFieldLand, "Land",email);
+            setDataFromDatabase(TextFieldLand, "Land", email);
 
         });
 
@@ -137,12 +146,12 @@ public class GUI extends Application {
         stage.show();
     }
 
-    private void setDataFromDatabase(TextField textField, String culumName , String email) {
+    private void setDataFromDatabase(TextField textField, String culumName, String email) {
         try {
             Database Database = new Database();
 
             Connection con = Database.getConnection();
-            
+
             String SQL = "SELECT * FROM cursist WHERE Email = ?";
 
             PreparedStatement preparedStatement = con.prepareStatement(SQL);
@@ -154,9 +163,36 @@ public class GUI extends Application {
             while (resultSet.next()) {
                 textField.setText(resultSet.getString(culumName));
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        catch(SQLException e)
-    {
-        e.printStackTrace();
     }
-}}
+
+    private void setDataInDatabase(String email, String naam, String geboorteDatum, Integer geslacht, String adres,
+            String woonplaats, String land) {
+        try {
+            Database Database = new Database();
+
+            Connection con = Database.getConnection();
+
+            String SQL = "INSERT INTO cursist values(?,?,?,?,?,?,?)";
+
+            PreparedStatement preparedStatement = con.prepareStatement(SQL);
+
+            preparedStatement.setString(1, email);
+            preparedStatement.setString(2, naam);
+            preparedStatement.setString(3, geboorteDatum);
+            preparedStatement.setInt(4, geslacht);
+            preparedStatement.setString(5, adres);
+            preparedStatement.setString(6, woonplaats);
+            preparedStatement.setString(7, land);
+
+            int r = preparedStatement.executeUpdate();
+
+            System.out.println(r + " records inserted");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
