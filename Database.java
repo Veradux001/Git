@@ -1,5 +1,7 @@
 import java.sql.*;
 
+import javafx.scene.control.TextField;
+
 /**
  * Dit is een voorbeeld Java toepassing waarin je verbinding maakt met een
  * SQLServer database.
@@ -14,7 +16,7 @@ public class Database {
     private static String password = "Striker@2024";
     private static Connection con = null;
 
-    public static Connection getConnection() {
+    public Connection getConnection() {
         try {
             Class.forName(driverName);
             try {
@@ -28,5 +30,104 @@ public class Database {
             System.out.println("Driver not found.");
         }
         return con;
+    }
+
+    protected void setDataFromDatabase(TextField textField, String culumName, String email) {
+        try {
+            Database Database = new Database();
+
+            Connection con = Database.getConnection();
+
+            String SQL = "SELECT * FROM cursist WHERE Email = ?";
+
+            PreparedStatement preparedStatement = con.prepareStatement(SQL);
+
+            preparedStatement.setString(1, email);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                textField.setText(resultSet.getString(culumName));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    protected void setDataInDatabase(String email, String naam, String geboorteDatum, Integer geslacht, String adres,
+            String woonplaats, String land) {
+        try {
+            Database Database = new Database();
+
+            Connection con = Database.getConnection();
+
+            String SQL = "INSERT INTO cursist values(?,?,?,?,?,?,?)";
+
+            PreparedStatement preparedStatement = con.prepareStatement(SQL);
+
+            preparedStatement.setString(1, email);
+            preparedStatement.setString(2, naam);
+            preparedStatement.setString(3, geboorteDatum);
+            preparedStatement.setInt(4, geslacht);
+            preparedStatement.setString(5, adres);
+            preparedStatement.setString(6, woonplaats);
+            preparedStatement.setString(7, land);
+
+            int r = preparedStatement.executeUpdate();
+
+            System.out.println(r + " records inserted");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected void updateDataFromDatabase(String email, String naam, String geboorteDatum, Integer geslacht, String adres,
+    String woonplaats, String land) {
+        try {
+            Database Database = new Database();
+
+            Connection con = Database.getConnection();
+
+            String SQL = "UPDATE cursist SET Email = ?, Naam = ?, GeboorteDatum = ?, Geslacht = ?, Adres = ?, Woonplaats = ?, Land = ? WHERE Email = ?";
+
+            PreparedStatement preparedStatement = con.prepareStatement(SQL);
+
+            preparedStatement.setString(1, email);
+            preparedStatement.setString(2, naam);
+            preparedStatement.setString(3, geboorteDatum);
+            preparedStatement.setInt(4, geslacht);
+            preparedStatement.setString(5, adres);
+            preparedStatement.setString(6, woonplaats);
+            preparedStatement.setString(7, land);
+            preparedStatement.setString(8, email);
+
+            int r = preparedStatement.executeUpdate();
+
+            System.out.println(r + " records updated");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        protected void deleteDataFromDatabase(String email) {
+        try {
+            Database Database = new Database();
+
+            Connection con = Database.getConnection();
+
+            String SQL = "DELETE FROM cursist WHERE Email=?";
+
+            PreparedStatement preparedStatement = con.prepareStatement(SQL);
+
+            preparedStatement.setString(1, email);
+
+            int r = preparedStatement.executeUpdate();
+
+            System.out.println(r + " records deleted");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

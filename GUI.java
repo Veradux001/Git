@@ -25,6 +25,9 @@ import javafx.stage.Stage;
 public class GUI extends Application {
     @Override
     public void start(Stage stage) {
+
+        Database Database = new Database();
+
         stage.setTitle("CRUD cursist"); // Komt bovenin
         // Scene mainView = new Scene(label);
 
@@ -102,35 +105,38 @@ public class GUI extends Application {
             String woonplaats = TextFieldWoonplaats.getText();
             String land = TextFieldLand.getText();
 
-            setDataInDatabase(email, naam, geboorteDatum, geslacht, adres, woonplaats, land);
+            Database.setDataInDatabase(email, naam, geboorteDatum, geslacht, adres, woonplaats, land);
 
         });
 
         button2.setOnAction((event) -> {
             String email = TextFieldEmail.getText();
-            setDataFromDatabase(TextFieldEmail, "Email", email);
-            setDataFromDatabase(TextFieldNaam, "Naam", email);
-            setDataFromDatabase(TextFieldGeboortedatum, "GeboorteDatum", email);
-            setDataFromDatabase(TextFieldGeslacht, "Geslacht", email);
-            setDataFromDatabase(TextFieldAdres, "Adres", email);
-            setDataFromDatabase(TextFieldWoonplaats, "Woonplaats", email);
-            setDataFromDatabase(TextFieldLand, "Land", email);
+            Database.setDataFromDatabase(TextFieldEmail, "Email", email);
+            Database.setDataFromDatabase(TextFieldNaam, "Naam", email);
+            Database.setDataFromDatabase(TextFieldGeboortedatum, "GeboorteDatum", email);
+            Database.setDataFromDatabase(TextFieldGeslacht, "Geslacht", email);
+            Database.setDataFromDatabase(TextFieldAdres, "Adres", email);
+            Database.setDataFromDatabase(TextFieldWoonplaats, "Woonplaats", email);
+            Database.setDataFromDatabase(TextFieldLand, "Land", email);
 
         });
 
-        // button3.setOnAction((event) -> {
-        // Integer value1 = Integer.valueOf(textField.getText());
-        // Integer value2 = Integer.valueOf(textField1.getText());
-        // Integer r = value1 - value2;
-        // textField2.setText(r.toString());
-        // });
+        button3.setOnAction((event) -> {
+            String email = TextFieldEmail.getText();
+            String naam = TextFieldNaam.getText();
+            String geboorteDatum = TextFieldGeboortedatum.getText();
+            Integer geslacht = Integer.valueOf(TextFieldGeslacht.getText());
+            String adres = TextFieldAdres.getText();
+            String woonplaats = TextFieldWoonplaats.getText();
+            String land = TextFieldLand.getText();
 
-        // button4.setOnAction((event) -> {
-        // Integer value1 = Integer.valueOf(textField.getText());
-        // Integer value2 = Integer.valueOf(textField1.getText());
-        // Integer r = value1 * value2;
-        // textField2.setText(r.toString());
-        // });
+            Database.updateDataFromDatabase(email, naam, geboorteDatum, geslacht, adres, woonplaats, land);
+        });
+
+        button4.setOnAction((event) -> {
+            String email = TextFieldEmail.getText();
+            Database.deleteDataFromDatabase(email);
+        });
 
         VBox vb = new VBox();
         vb.getChildren().addAll(hb1, hb2, hb3, hb4, hb5, hb6, hb7);
@@ -144,55 +150,5 @@ public class GUI extends Application {
 
         stage.setScene(mainView);
         stage.show();
-    }
-
-    private void setDataFromDatabase(TextField textField, String culumName, String email) {
-        try {
-            Database Database = new Database();
-
-            Connection con = Database.getConnection();
-
-            String SQL = "SELECT * FROM cursist WHERE Email = ?";
-
-            PreparedStatement preparedStatement = con.prepareStatement(SQL);
-
-            preparedStatement.setString(1, email);
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next()) {
-                textField.setText(resultSet.getString(culumName));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void setDataInDatabase(String email, String naam, String geboorteDatum, Integer geslacht, String adres,
-            String woonplaats, String land) {
-        try {
-            Database Database = new Database();
-
-            Connection con = Database.getConnection();
-
-            String SQL = "INSERT INTO cursist values(?,?,?,?,?,?,?)";
-
-            PreparedStatement preparedStatement = con.prepareStatement(SQL);
-
-            preparedStatement.setString(1, email);
-            preparedStatement.setString(2, naam);
-            preparedStatement.setString(3, geboorteDatum);
-            preparedStatement.setInt(4, geslacht);
-            preparedStatement.setString(5, adres);
-            preparedStatement.setString(6, woonplaats);
-            preparedStatement.setString(7, land);
-
-            int r = preparedStatement.executeUpdate();
-
-            System.out.println(r + " records inserted");
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 }
